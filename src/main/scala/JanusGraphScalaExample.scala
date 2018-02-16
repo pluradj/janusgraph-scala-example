@@ -21,6 +21,8 @@ object JanusGraphScalaExample {
     val defeated = mgmt.makeEdgeLabel("defeated").make()
     val year = mgmt.makePropertyKey("year").dataType(classOf[Integer]).make()
     val yearIndex = mgmt.buildIndex("yearIndex", classOf[Edge]).addKey(year).buildCompositeIndex()
+    val score = mgmt.makePropertyKey("score").dataType(classOf[java.lang.Double]).make()
+    val scoreIndex = mgmt.buildIndex("scoreIndex", classOf[Edge]).addKey(score).buildCompositeIndex()
     mgmt.commit()
 
     // verify index status
@@ -29,13 +31,14 @@ object JanusGraphScalaExample {
     println( mgmt.getGraphIndex("ageIndex").getIndexStatus(mgmt.getPropertyKey("age")) )
     println( mgmt.getGraphIndex("weightIndex").getIndexStatus(mgmt.getPropertyKey("weight")) )
     println( mgmt.getGraphIndex("yearIndex").getIndexStatus(mgmt.getPropertyKey("year")) )
+    println( mgmt.getGraphIndex("scoreIndex").getIndexStatus(mgmt.getPropertyKey("score")) )
     mgmt.rollback();
 
     // add vertices and edges
-    val mike = g.addV("person").property("name", "ironmike").property("age", 51).property("weight", 240.5d).next()
-    val evander = g.addV("person").property("name", "realdeal").property("age", 55).property("weight", 226.0d).next()
-    g.V(mike).as("m").V(evander).addE("defeated").property("year", 1996).to("m").iterate()
-    g.V(mike).as("m").V(evander).addE("defeated").property("year", 1997).to("m").iterate()
+    val tyson = g.addV("person").property("name", "ironmike").property("age", 51).property("weight", 240.5d).next()
+    val holyfield = g.addV("person").property("name", "realdeal").property("age", 55).property("weight", 226.0d).next()
+    g.V(tyson).as("m").V(holyfield).addE("defeated").property("year", 1996).property("score", 8.5d).to("m").iterate()
+    g.V(tyson).as("m").V(holyfield).addE("defeated").property("year", 1997).property("score", 9.7d).to("m").iterate()
 
     // get vertex by string index
     println( g.V().has("name", "ironmike").valueMap(true).toList() )
@@ -46,8 +49,11 @@ object JanusGraphScalaExample {
     // get vertex by double index
     println( g.V().has("weight", 240.5d).valueMap(true).toList() )
 
-    // get edge by index
+    // get edge by integer index
     println( g.E().has("year", 1996).valueMap(true).toList() )
+
+    // get edge by double index
+    println( g.E().has("score", 9.7d).valueMap(true).toList() )
 
     // close graph
     graph.close()
